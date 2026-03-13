@@ -8,10 +8,18 @@
 
 body{
 font-family: Arial;
-background:#f4f6f9;
+background:linear-gradient(135deg,#667eea,#764ba2);
+margin:0;
+padding:20px;
+}
+
+.container{
 max-width:900px;
 margin:auto;
-padding:20px;
+background:white;
+padding:25px;
+border-radius:15px;
+box-shadow:0 10px 30px rgba(0,0,0,0.2);
 }
 
 h1{
@@ -19,22 +27,27 @@ text-align:center;
 }
 
 .question{
-background:white;
+background:#f7f9fc;
 padding:15px;
-margin-bottom:15px;
+margin-top:15px;
 border-radius:10px;
-box-shadow:0 0 5px rgba(0,0,0,0.1);
 }
 
 label{
 display:block;
-margin:4px 0;
+padding:5px;
+cursor:pointer;
+border-radius:5px;
+}
+
+label:hover{
+background:#e9f2ff;
 }
 
 button{
 display:block;
-margin:20px auto;
-padding:12px 25px;
+margin:30px auto;
+padding:14px 30px;
 font-size:18px;
 background:#2c7be5;
 color:white;
@@ -43,11 +56,24 @@ border-radius:8px;
 cursor:pointer;
 }
 
+button:hover{
+background:#1a5edb;
+}
+
 .result{
-font-size:24px;
 text-align:center;
+font-size:24px;
 font-weight:bold;
 margin-top:20px;
+}
+
+.correct{background:#d4edda;}
+.wrong{background:#f8d7da;}
+.unanswered{background:#fff3cd;}
+
+.answerText{
+margin-top:6px;
+font-weight:bold;
 }
 
 </style>
@@ -55,116 +81,74 @@ margin-top:20px;
 
 <body>
 
+<div class="container">
+
 <h1>Trắc nghiệm Kinh tế chính trị Mác - Lênin</h1>
 
 <form id="quizForm"></form>
 
-<button type="button" onclick="submitQuiz()">Nộp bài</button>
+<button onclick="submitQuiz()" type="button">Nộp bài</button>
 
 <div class="result" id="result"></div>
+
+</div>
 
 <script>
 
 const quiz=[
-
 {q:"1. Đối tượng nghiên cứu của Kinh tế chính trị Mác-Lênin là:",options:["Sản xuất của cải vật chất","Quan hệ xã hội giữa người với người","Quan hệ xã hội của sản xuất và trao đổi trong sự liên hệ biện chứng với trình độ phát triển của LLSX và kiến trúc thượng tầng","Quá trình sản xuất, phân phối, trao đổi, tiêu dùng"],answer:2},
-
 {q:"2. Thuật ngữ 'kinh tế chính trị' được sử dụng lần đầu tiên vào năm nào?",options:["1612","1615","1614","1618"],answer:1},
-
 {q:"3. Giá trị hàng hóa được quyết định bởi:",options:["Sự khan hiếm hàng hóa","Sự hao phí sức lao động của con người","Lao động trừu tượng của người sản xuất kết tinh trong hàng hóa","Công dụng của hàng hóa"],answer:2},
-
 {q:"4. Giá trị sử dụng của hàng hóa là:",options:["Tính chất sẵn có của hàng hóa","Phạm trù lịch sử","Công dụng của hàng hóa có thể thỏa mãn nhu cầu nào đó của con người","Thuộc tính tự nhiên của hàng hóa"],answer:2},
-
 {q:"5. Hình thức xuất khẩu chủ yếu của CNTB hiện nay:",options:["Xuất khẩu tư bản + hàng hóa","Đầu tư trực tiếp + gián tiếp","Đầu tư gián tiếp","Đầu tư trực tiếp"],answer:1},
-
 {q:"6. Theo C.Mác hàng hóa là:",options:["Sản phẩm lao động thỏa nhu cầu","Sản phẩm lao động để trao đổi mua bán","Sản phẩm có ích do lao động","Do lao động tạo ra"],answer:1},
-
 {q:"7. Định nghĩa đúng về tư bản:",options:["Tiền và máy móc","Tiền đẻ ra tiền","Giá trị mang lại giá trị thặng dư","Công cụ sản xuất"],answer:2},
-
 {q:"8. Kinh tế tri thức là:",options:["Phương thức sản xuất mới","Hình thái kinh tế xã hội mới","Giai đoạn mới CNTB","Nấc thang phát triển LLSX"],answer:3},
-
 {q:"9. Ai nghiên cứu sâu CNTB độc quyền:",options:["C.Mác","C.Mác và Ăngghen","V.I.Lênin","Ph.Ăngghen"],answer:2},
-
 {q:"10. Quá trình chuyển từ lao động thủ công sang công nghệ hiện đại:",options:["Công nghiệp hóa","Hiện đại hóa","Công nghiệp hóa hiện đại hóa","Tự động hóa"],answer:2},
 
 {q:"11. Ai đưa ra khái niệm kinh tế chính trị:",options:["Antoine Montchretien","Tomas Mun","William Petty","Quesnay"],answer:0},
-
 {q:"12. Vì sao cạnh tranh không bị thủ tiêu:",options:["Độc quyền cạnh tranh ngoài","Độc quyền cạnh tranh nhau","Cạnh tranh là quy luật khách quan","Do nội bộ cạnh tranh"],answer:2},
-
 {q:"13. Kế thừa trường phái kinh tế nào:",options:["Trọng thương","Trọng nông","Kinh tế chính trị cổ điển Anh","Kinh tế tầm thường"],answer:2},
-
 {q:"14. Sản xuất hàng hóa ra đời khi:",options:["Phân công lao động xã hội và tách biệt kinh tế","Phân công lao động và tách biệt tương đối","Phân công cá biệt và tư hữu","Phân công lao động và công hữu"],answer:0},
-
 {q:"15. Phương thức phát triển tốt nhất trong toàn cầu hóa:",options:["Bảo hộ mậu dịch","Hội nhập kinh tế quốc tế","Hợp tác hệ thống chính trị","Hợp tác khu vực"],answer:1},
-
 {q:"16. Quy luật giá trị yêu cầu:",options:["Hao phí lao động cá biệt","Hao phí lao động xã hội cần thiết","Hao phí thời gian lao động","Hao phí lao động quá khứ"],answer:1},
-
 {q:"17. Công thức chung của tư bản:",options:["T-H-T'","T-H-SLĐ","H-T-H","H-SLĐ-H'"],answer:0},
-
 {q:"18. Giá trị thặng dư là:",options:["Lợi nhuận","Giá trị tự tăng","Phần giá trị dôi ra ngoài giá trị sức lao động","Hiệu số giá trị"],answer:2},
-
 {q:"19. Mô hình kinh tế VN:",options:["KTTT có quản lý","KT nhiều thành phần","KT nhiều thành phần quản lý","KTTT định hướng XHCN"],answer:3},
-
 {q:"20. Đặc trưng CMCN 4.0:",options:["Hơi nước","CNTT tự động hóa","Liên kết thế giới thực và ảo","Năng lượng điện"],answer:2},
 
 {q:"21. Ai phát hiện lao động hai mặt:",options:["A.Smith","Ricardo","C.Mác","Ăngghen"],answer:2},
-
 {q:"22. Học thuyết hòn đá tảng:",options:["Giá trị","Giá trị thặng dư","Tích lũy tư bản","Tái sản xuất"],answer:1},
-
 {q:"23. Câu sai về KTTT:",options:["Đối lập KT tự nhiên","Đối lập chế độ xã hội","Thành tựu chung","Phát triển mạnh CNTB"],answer:1},
-
 {q:"24. Kết quả cạnh tranh độc quyền:",options:["Mở rộng SX","Thỏa hiệp hoặc phá sản","Hợp tác","Ứng dụng KH"],answer:1},
-
 {q:"25. Bán đúng giá trị:",options:["p=m","p>m","p<m","p=0"],answer:0},
-
 {q:"26. Không ảnh hưởng tỷ suất lợi nhuận:",options:["Tỷ suất GT thặng dư","Cạnh tranh","Tốc độ chu chuyển","Cấu tạo hữu cơ"],answer:1},
-
 {q:"27. Tư bản bất biến:",options:["Khấu hao","Giá trị tăng","Không đổi chuyển sau chu kỳ","Chuyển nguyên vẹn"],answer:2},
-
 {q:"28. Tiền lương TBCN:",options:["Giá trị lao động","Trả công","Giá cả sức lao động","Giá trị sức lao động"],answer:2},
-
 {q:"29. GT thặng dư tuyệt đối:",options:["Kéo dài ngày lao động","Tiết kiệm chi phí","Kỹ thuật tiên tiến","Tăng năng suất"],answer:0},
-
 {q:"30. Tư bản tài chính:",options:["Độc quyền NH","Thị trường tài chính","Độc quyền CN","Liên kết NH và CN"],answer:3},
 
 {q:"31. Nguyên nhân CNTB độc quyền:",options:["Đấu tranh giai cấp","Nhà nước can thiệp","Tích tụ tập trung sản xuất","Phân công lao động"],answer:2},
-
 {q:"32. Chức năng cơ bản nhất của tiền:",options:["Thước đo giá trị","Lưu thông","Cất trữ","Thanh toán"],answer:0},
-
 {q:"33. Người sáng lập CN Mác:",options:["C.Mác","Mác Lênin","Mác Ăngghen","Mác Ăngghen Lênin"],answer:2},
-
 {q:"34. Quan hệ cung cầu thuộc:",options:["Sản xuất và tiêu dùng","Tiêu dùng","Trao đổi","Phân phối"],answer:0},
-
 {q:"35. Khác biệt KTTT XHCN:",options:["Điều tiết NN","Nhiều thành phần","Vai trò chủ đạo KTNN","Nhiều sở hữu"],answer:2},
-
 {q:"36. C và V thuộc tư bản:",options:["Tiền tệ","Sản xuất","Hàng hóa","Lưu thông"],answer:0},
-
 {q:"37. Giá trị hàng hóa do:",options:["Khan hiếm","Hao phí lao động","Lao động trừu tượng","Công dụng"],answer:2},
-
 {q:"38. Bản chất CNTB độc quyền NN:",options:["Kết hợp độc quyền tư nhân và NN","NN chi phối","Phụ thuộc","Thỏa hiệp"],answer:0},
-
 {q:"39. Chủ thể xuất khẩu tư bản:",options:["Tư bản tư nhân","Độc quyền trong nước","Độc quyền xuyên quốc gia","Tư bản NN"],answer:2},
-
 {q:"40. Công thức giá trị:",options:["G=c+(v+p)","G=c+(v+m)","G=v+m","G=c+v"],answer:1},
 
 {q:"41. CNH Anh bắt đầu:",options:["Dệt","VLXD","Cơ khí","Chế biến"],answer:0},
-
 {q:"42. Quan điểm đúng KTTT:",options:["Do CNTB sinh","Cùng bản chất KT hàng hóa","Tồn tại chủ quan","Sản phẩm riêng CNTB"],answer:1},
-
 {q:"43. Biểu hiện quy luật GT thặng dư:",options:["Giá cả SX","Giá độc quyền","Lợi nhuận độc quyền","Tỷ suất lợi nhuận bình quân"],answer:3},
-
 {q:"44. Mác nghiên cứu CNTB từ:",options:["Lưu thông","SX của cải","SX hàng hóa giản đơn","SX GT thặng dư"],answer:2},
-
 {q:"45. Quy luật giá trị tồn tại:",options:["SX hàng hóa giản đơn","SX TBCN","SX vật chất","KT hàng hóa"],answer:3},
-
 {q:"46. Tỷ suất GT thặng dư phản ánh:",options:["Trình độ bóc lột","Hiệu quả đầu tư","Nơi đầu tư","Quy mô bóc lột"],answer:0},
-
 {q:"47. CNH NICs:",options:["CN nhẹ","CN nặng","Xuất khẩu + thu hút nguồn lực","Xuất khẩu nội lực"],answer:2},
-
 {q:"48. Mục đích CNH HĐH:",options:["Năng suất cao","Thị trường sôi động","Cơ hội lao động","Cơ sở vật chất hiện đại"],answer:3},
-
 {q:"49. Chia tư bản C và V để:",options:["Di chuyển giá trị","Nguồn gốc GT thặng dư","Vai trò lao động","Bản chất SX"],answer:1},
-
 {q:"50. Khi cung > cầu:",options:["Giá < giá trị","Giá > giá trị","Giá = giá trị","Không ảnh hưởng"],answer:0}
 
 ];
@@ -172,17 +156,26 @@ const quiz=[
 const form=document.getElementById("quizForm");
 
 quiz.forEach((q,i)=>{
+
 let div=document.createElement("div");
 div.className="question";
+div.id="question"+i;
 
 let html=`<b>${q.q}</b>`;
 
 q.options.forEach((opt,j)=>{
-html+=`<label><input type="radio" name="q${i}" value="${j}"> ${opt}</label>`;
+html+=`
+<label>
+<input type="radio" name="q${i}" value="${j}">
+${opt}
+</label>`;
 });
+
+html+=`<div class="answerText" id="answer${i}"></div>`;
 
 div.innerHTML=html;
 form.appendChild(div);
+
 });
 
 function submitQuiz(){
@@ -190,14 +183,37 @@ function submitQuiz(){
 let score=0;
 
 quiz.forEach((q,i)=>{
-let ans=document.querySelector(`input[name="q${i}"]:checked`);
 
-if(ans && Number(ans.value)===q.answer){
+let ans=document.querySelector(`input[name="q${i}"]:checked`);
+let question=document.getElementById("question"+i);
+let answerText=document.getElementById("answer"+i);
+
+if(ans){
+
+if(Number(ans.value)===q.answer){
+
 score++;
+question.classList.add("correct");
+answerText.innerHTML="✅ Đúng";
+
+}else{
+
+question.classList.add("wrong");
+answerText.innerHTML="❌ Sai — Đáp án đúng: "+q.options[q.answer];
+
 }
+
+}else{
+
+question.classList.add("unanswered");
+answerText.innerHTML="⚠️ Chưa chọn — Đáp án đúng: "+q.options[q.answer];
+
+}
+
 });
 
-document.getElementById("result").innerHTML="Bạn đúng "+score+" / "+quiz.length+" câu";
+document.getElementById("result").innerHTML=
+"Bạn đúng "+score+" / "+quiz.length+" câu";
 
 }
 
